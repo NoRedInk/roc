@@ -17,6 +17,7 @@ flate2 = "1.0.24"
 walkdir = "2.3.2"
 blake3 = "1.3.1"
 base64-url = "1.4.13"
+fs_extra = "1.2.0"
 
 bumpalo.workspace = true
 tempfile.workspace = true

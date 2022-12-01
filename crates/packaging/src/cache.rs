@@ -71,7 +71,9 @@ pub fn install_package<'a>(
                     fs::create_dir_all(parent_dir).map_err(Problem::IoErr)?;
 
                     // This should be super cheap - just an inode change.
-                    fs::rename(tempdir_path, &dest_dir).map_err(Problem::IoErr)?;
+                    // But it has to use fs_extra bc under nix it crosses a device boundary
+                    let options = fs_extra::dir::CopyOptions::new();
+                    fs_extra::dir::move_dir(tempdir_path, &dest_dir, &options).map_err(Problem::FsErr)?;
 
                     // The package's files are now in the cache. We're done!
                     Ok((dest_dir, root_module_filename))
