@@ -74,7 +74,8 @@ pub fn install_package<'a>(
                     // This should be super cheap - just an inode change.
                     // But it has to use fs_extra bc tempfile won't guarantee a tempdir in the same
                     // device as dest_dir, and a simple fs::rename can't handle cross-device
-                    let options = fs_extra::dir::CopyOptions::new();
+                    let mut options = fs_extra::dir::CopyOptions::new();
+                    options.content_only = true;
                     fs_extra::dir::move_dir(tempdir_path, &dest_dir, &options).map_err(Problem::FsErr)?;
 
                     // The package's files are now in the cache. We're done!
