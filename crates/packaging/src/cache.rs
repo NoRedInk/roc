@@ -67,15 +67,14 @@ pub fn install_package<'a>(
                 if downloaded_hash == content_hash {
                     // Now that we've verified the hash, rename the tempdir to the real dir.
 
-                    println!("parent_dir: {}", parent_dir.display());
-                    // Create the destination dir's parent dir, since it may not exist yet.
-                    fs::create_dir_all(parent_dir).map_err(Problem::IoErr)?;
+                    // Create the destination directory, since it may not exist, and fs_extra only
+                    // moves contents
+                    fs::create_dir_all(&dest_dir).map_err(Problem::IoErr)?;
 
                     // This should be super cheap - just an inode change.
-                    // But it has to use fs_extra bc under nix it crosses a device boundary
+                    // But it has to use fs_extra bc tempfile won't guarantee a tempdir in the same
+                    // device as dest_dir, and a simple fs::rename can't handle cross-device
                     let options = fs_extra::dir::CopyOptions::new();
-                    println!("tempdir_path: {}", tempdir_path.display());
-                    println!("dest_dir: {}", dest_dir.display());
                     fs_extra::dir::move_dir(tempdir_path, &dest_dir, &options).map_err(Problem::FsErr)?;
 
                     // The package's files are now in the cache. We're done!
